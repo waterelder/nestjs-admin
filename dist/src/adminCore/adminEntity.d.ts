@@ -1,4 +1,4 @@
-import { Connection, EntityMetadata, SelectQueryBuilder } from '../utils/typeormProxy';
+import { Connection, EntityMetadata } from '../utils/typeormProxy';
 import { EntityType } from '../types';
 import DefaultAdminSite from './adminSite';
 import { WidgetConstructor } from './widgets/widget.interface';
@@ -21,8 +21,8 @@ declare abstract class AdminEntity {
     validateListConfig(): void;
     private validateDisplayFields;
     private validateSearchFields;
-    protected buildSearchQueryOptions(query: SelectQueryBuilder<unknown>, alias: string, searchParam: string): SelectQueryBuilder<unknown>;
-    protected buildPaginationQueryOptions(query: SelectQueryBuilder<unknown>, page: number): SelectQueryBuilder<unknown>;
+    protected buildSearchQueryOptions(options: any, searchParam: string): any;
+    protected buildPaginationQueryOptions(options: any, page: number): any;
     getEntityList(page: number, searchString: string): Promise<{
         entities: unknown[];
         count: number;

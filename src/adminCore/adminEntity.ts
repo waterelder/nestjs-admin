@@ -93,32 +93,29 @@ abstract class AdminEntity {
   }
 
   protected buildSearchQueryOptions(
-    query: SelectQueryBuilder<unknown>,
-    alias: string,
+    options: any,
     searchParam: string,
   ) {
     if (searchParam && this.searchFields) {
       const searchArray = searchParam.split(' ')
-      searchArray.forEach((searchTerm, searchTermIndex) =>
-        query.andWhere(
-          new Brackets((qb: SelectQueryBuilder<unknown>) => {
-            this.searchFields.forEach((field, fieldIndex) => {
-              const paramString = `searchTerm${searchTermIndex}Field${fieldIndex}`
-              qb.orWhere(`${alias}.${field} LIKE :${paramString}`, {
-                [paramString]: `%${searchTerm}%`,
-              })
-            })
-            return qb
-          }),
-        ),
-      )
+      const optionsSearchArray = [];
+      searchArray.forEach((searchTerm, searchTermIndex) => {
+        this.searchFields.forEach((field, fieldIndex) => {
+          optionsSearchArray.push({[field]: { $regex: `.*${searchTerm}.*`, $options: 'ig'}})
+        })
+      })
+      options.where = {
+        $or: optionsSearchArray
+      }
+      console.info(options)
     }
-    return query
+    return options
   }
 
-  protected buildPaginationQueryOptions(query: SelectQueryBuilder<unknown>, page: number) {
-    query.skip(this.resultsPerPage * (page - 1)).take(this.resultsPerPage)
-    return query
+  protected buildPaginationQueryOptions(options: any, page: number) {
+    options.skip = this.resultsPerPage * (page - 1);
+    options.limit = this.resultsPerPage;
+    return options
   }
 
   async getEntityList(
@@ -129,7 +126,11 @@ abstract class AdminEntity {
     // let query = this.adminSite.entityManager.createQueryBuilder(this.entity, alias)
     // query = this.buildPaginationQueryOptions(query, page)
     // query = this.buildSearchQueryOptions(query, alias, searchString)
-    const [entities, count] = await this.repository.findAndCount()
+    let options: any = {};
+    options = this.buildPaginationQueryOptions(options, page);
+    options = this.buildSearchQueryOptions(options, searchString);
+
+    const [entities, count] = await this.repository.findAndCount(options)
     return { entities, count }
   }
 

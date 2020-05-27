@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typeormProxy_1 = require("../utils/typeormProxy");
 const utils_1 = require("./widgets/utils");
 const manyToManyWidget_1 = require("./widgets/manyToManyWidget");
 const invalidDisplayFields_exception_1 = require("./exceptions/invalidDisplayFields.exception");
@@ -74,28 +73,33 @@ class AdminEntity {
         validateFieldsExist(this, 'searchFields', this.metadata);
         validateFieldsAreNotRelation(this, 'searchFields', this.metadata);
     }
-    buildSearchQueryOptions(query, alias, searchParam) {
+    buildSearchQueryOptions(options, searchParam) {
         if (searchParam && this.searchFields) {
             const searchArray = searchParam.split(' ');
-            searchArray.forEach((searchTerm, searchTermIndex) => query.andWhere(new typeormProxy_1.Brackets((qb) => {
+            const optionsSearchArray = [];
+            searchArray.forEach((searchTerm, searchTermIndex) => {
                 this.searchFields.forEach((field, fieldIndex) => {
-                    const paramString = `searchTerm${searchTermIndex}Field${fieldIndex}`;
-                    qb.orWhere(`${alias}.${field} LIKE :${paramString}`, {
-                        [paramString]: `%${searchTerm}%`,
-                    });
+                    optionsSearchArray.push({ [field]: { $regex: `.*${searchTerm}.*`, $options: 'ig' } });
                 });
-                return qb;
-            })));
+            });
+            options.where = {
+                $or: optionsSearchArray
+            };
+            console.info(options);
         }
-        return query;
+        return options;
     }
-    buildPaginationQueryOptions(query, page) {
-        query.skip(this.resultsPerPage * (page - 1)).take(this.resultsPerPage);
-        return query;
+    buildPaginationQueryOptions(options, page) {
+        options.skip = this.resultsPerPage * (page - 1);
+        options.limit = this.resultsPerPage;
+        return options;
     }
     getEntityList(page, searchString) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [entities, count] = yield this.repository.findAndCount();
+            let options = {};
+            options = this.buildPaginationQueryOptions(options, page);
+            options = this.buildSearchQueryOptions(options, searchString);
+            const [entities, count] = yield this.repository.findAndCount(options);
             return { entities, count };
         });
     }
