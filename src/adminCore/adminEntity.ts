@@ -107,7 +107,6 @@ abstract class AdminEntity {
       options.where = {
         $or: optionsSearchArray
       }
-      console.info(options)
     }
     return options
   }
