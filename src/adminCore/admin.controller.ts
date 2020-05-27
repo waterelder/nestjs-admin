@@ -120,7 +120,7 @@ export class DefaultAdminController {
     @Param() params: AdminModelsQuery,
     @Response() response: express.Response,
   ) {
-    const { section, metadata } = await this.getAdminModels(params)
+    const { section, metadata, adminEntity } = await this.getAdminModels(params)
 
     // @debt architecture "This should be entirely moved to the adminSite, so that it can be overriden by the custom adminSite of a user"
     let entityToBePersisted = await this.adminSite.cleanValues(createEntityDto, metadata)
@@ -130,8 +130,9 @@ export class DefaultAdminController {
     if (isClass(metadata.target)) {
       entityToBePersisted = Object.assign(new metadata.target(), entityToBePersisted)
     }
-
     const createdEntity = await this.entityManager.save(entityToBePersisted)
+
+   //  const createdEntity = await adminEntity.save(entityToBePersisted);
 
     request.flash(
       'messages',

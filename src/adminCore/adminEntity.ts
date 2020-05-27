@@ -5,6 +5,7 @@ import DefaultAdminSite from './adminSite'
 import ManyToManyWidget from './widgets/manyToManyWidget'
 import { InvalidDisplayFieldsException } from './exceptions/invalidDisplayFields.exception'
 import { WidgetConstructor } from './widgets/widget.interface'
+import {getMongoRepository} from 'typeorm';
 
 abstract class AdminEntity {
   abstract entity: EntityType
@@ -27,7 +28,7 @@ abstract class AdminEntity {
   ) {}
 
   get repository() {
-    return this.connection.getRepository(this.entity)
+    return this.connection.getMongoRepository(this.entity)
   }
 
   get metadata() {
@@ -124,12 +125,16 @@ abstract class AdminEntity {
     page: number,
     searchString: string,
   ): Promise<{ entities: unknown[]; count: number }> {
-    const alias = this.name
-    let query = this.adminSite.entityManager.createQueryBuilder(this.entity, alias)
-    query = this.buildPaginationQueryOptions(query, page)
-    query = this.buildSearchQueryOptions(query, alias, searchString)
-    const [entities, count] = await query.getManyAndCount()
+    // const alias = this.name
+    // let query = this.adminSite.entityManager.createQueryBuilder(this.entity, alias)
+    // query = this.buildPaginationQueryOptions(query, page)
+    // query = this.buildSearchQueryOptions(query, alias, searchString)
+    const [entities, count] = await this.repository.findAndCount()
     return { entities, count }
+  }
+
+  async save(obj: unknown) {
+    return await this.repository.save(obj)
   }
 }
 
