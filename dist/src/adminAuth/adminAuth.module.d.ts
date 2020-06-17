@@ -15,12 +15,12 @@ export declare class AdminAuthModuleFactory {
     static createAdminAuthModule({ adminCoreModule, credentialValidator, providers, imports, }: Partial<AdminAuthModuleConfig>): {
         module: typeof AdminAuthModuleFactory;
         imports: any[];
-        exports: (import("@nestjs/common").Type<any> | import("@nestjs/common").ClassProvider<any> | import("@nestjs/common").ValueProvider<any> | import("@nestjs/common").FactoryProvider<any> | import("@nestjs/common").ExistingProvider<any> | {
+        exports: (import("@nestjs/common").Type<any> | import("@nestjs/common/interfaces").ClassProvider<any> | import("@nestjs/common/interfaces").ValueProvider<any> | import("@nestjs/common/interfaces").FactoryProvider<any> | import("@nestjs/common/interfaces").ExistingProvider<any> | {
             provide: injectionTokens;
             useFactory: (dep: any) => CredentialValidator;
             inject: any[];
         })[];
-        providers: (import("@nestjs/common").Type<any> | import("@nestjs/common").ClassProvider<any> | import("@nestjs/common").ValueProvider<any> | import("@nestjs/common").FactoryProvider<any> | import("@nestjs/common").ExistingProvider<any> | {
+        providers: (import("@nestjs/common").Type<any> | import("@nestjs/common/interfaces").ClassProvider<any> | import("@nestjs/common/interfaces").ValueProvider<any> | import("@nestjs/common/interfaces").FactoryProvider<any> | import("@nestjs/common/interfaces").ExistingProvider<any> | {
             provide: injectionTokens;
             useFactory: (dep: any) => CredentialValidator;
             inject: any[];

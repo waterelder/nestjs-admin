@@ -114,6 +114,7 @@ abstract class AdminEntity {
   protected buildPaginationQueryOptions(options: any, page: number) {
     options.skip = this.resultsPerPage * (page - 1);
     options.limit = this.resultsPerPage;
+    options.order = {createdAt: -1}
     return options
   }
 

@@ -12,6 +12,7 @@ import {
   Req,
 } from '@nestjs/common'
 import { EntityMetadata, EntityManager } from 'typeorm'
+import { ObjectID } from 'mongodb';
 import * as express from 'express'
 import DefaultAdminSite from './adminSite'
 import DefaultAdminSection from './adminSection'
@@ -162,6 +163,10 @@ export class DefaultAdminController {
     // entity class needs to be saved so that listeners and subscribers are triggered
     // @ts-ignore
     const entityToBePersisted = Object.assign(new metadata.target(), entity, updatedValues)
+
+    if (entityToBePersisted.id) {
+      entityToBePersisted.id = new ObjectID(entityToBePersisted.id);
+    }
 
     // We first have to update the primary key, because `save()` would create a new entity.
     // We don't update all fields with `update()`, because it doesn't cascade or handle relations.

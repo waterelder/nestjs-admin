@@ -23,6 +23,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
+const mongodb_1 = require("mongodb");
 const express = require("express");
 const adminSite_1 = require("./adminSite");
 const admin_environment_1 = require("./admin.environment");
@@ -118,9 +119,14 @@ let DefaultAdminController = class DefaultAdminController {
             const { section, adminEntity, metadata, entity } = yield this.getAdminModels(params);
             const updatedValues = yield this.adminSite.cleanValues(updateEntityDto, metadata);
             const entityToBePersisted = Object.assign(new metadata.target(), entity, updatedValues);
+            console.info('entityToBePersisted', entityToBePersisted);
+            if (entityToBePersisted.id) {
+                entityToBePersisted.id = new mongodb_1.ObjectID(entityToBePersisted.id);
+            }
             yield this.entityManager.update(adminEntity.entity, metadata.getEntityIdMap(entity), metadata.getEntityIdMap(entityToBePersisted));
             yield this.entityManager.save(entityToBePersisted);
             const updatedEntity = yield this.getEntityWithRelations(adminEntity, entity_1.getPrimaryKeyValue(metadata, entityToBePersisted));
+            console.info('updatedEntity', updatedEntity);
             request.flash('messages', `Successfully updated ${admin_filters_1.prettyPrint(metadata.name)}: ${admin_filters_1.displayName(entity, metadata)}`);
             return response.redirect(urls.changeUrl(section, metadata, updatedEntity));
         });

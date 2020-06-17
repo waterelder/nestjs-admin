@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-local';
 import { CredentialValidator } from './adminAuth.module';
-declare const LocalStrategy_base: new (...args: any[]) => Strategy;
+declare const LocalStrategy_base: new (...args: any[]) => typeof Strategy;
 export declare class LocalStrategy extends LocalStrategy_base {
     private readonly credentialValidator;
     constructor(credentialValidator: CredentialValidator);

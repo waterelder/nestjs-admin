@@ -91,6 +91,7 @@ class AdminEntity {
     buildPaginationQueryOptions(options, page) {
         options.skip = this.resultsPerPage * (page - 1);
         options.limit = this.resultsPerPage;
+        options.order = { createdAt: -1 };
         return options;
     }
     getEntityList(page, searchString) {
